@@ -1,14 +1,12 @@
 package com.adriano.curso.ws.resources;
 
+import com.adriano.curso.ws.domain.Role;
 import com.adriano.curso.ws.domain.User;
 import com.adriano.curso.ws.dto.UserDTO;
 import com.adriano.curso.ws.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,4 +34,28 @@ public class UserResource {
         return ResponseEntity.ok().body(new UserDTO(user));
     }
 
+    @PostMapping("/users")
+    public ResponseEntity<UserDTO> create(@RequestBody UserDTO userDTO){
+        User user = userService.fromDTO(userDTO);
+        return ResponseEntity.ok().body(new UserDTO(userService.create(user)));
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserDTO> update(@PathVariable String id, @RequestBody UserDTO userDTO){
+        User user = userService.fromDTO(userDTO);
+        user.setId(id);
+        return ResponseEntity.ok().body(new UserDTO(userService.update(user)));
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users/{id}/roles")
+    public ResponseEntity<List<Role>> findRoles(@PathVariable String id){
+        User user = userService.findById(id);
+        return ResponseEntity.ok().body(user.getRoles());
+    }
 }
